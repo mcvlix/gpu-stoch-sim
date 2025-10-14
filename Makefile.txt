@@ -1,0 +1,9 @@
+.PHONY: dev build test bench lint
+dev:
+\tpip install -e .[dev]
+build:
+\tpython setup.py build_ext --inplace
+test:
+\tpytest -q
+bench:
+\tpython experiments/benchmark_em.py

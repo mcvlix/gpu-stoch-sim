@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "torch", "ninja"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdegpu"
+version = "0.1.0"
+description = "CUDA-accelerated SDE solvers for PyTorch"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Maxwell Arcinas", email = "mcalixto.contact@gmail.com" }]
+dependencies = ["torch>=2.2", "numpy", "tqdm", "matplotlib", "pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sdegpu = ["_cuda/*.cu", "_cuda/*.cpp", "_cuda/*.h"]
+
+ 
