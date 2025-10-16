@@ -1,22 +1,22 @@
 import pytest, torch
 from sdegpu.integrators import sdeint_euler
-from sdegpu.models import gbm_f, gbm_g
+from sdegpu.models import sde_f, sde_g
 
 cuda = torch.cuda.is_available()
 
 @pytest.mark.skipif(not cuda, reason="CUDA not available")
 def test_kernel_runs():
     device = "cuda"
-    B, d = 8192, 1
-    t = torch.linspace(0, 1, 128, device=device, dtype=torch.float32)
-    y0 = torch.ones(B, d, device=device, dtype=torch.float32)
-    p = {"mu": torch.tensor(0.1, device=device, dtype=torch.float32),
-         "sigma": torch.tensor(0.3, device=device, dtype=torch.float32)}
+    B, d = 8192, 1                                                         # Batch size, Dimension for y0
+    t = torch.linspace(0, 1, 128, device=device, dtype=torch.float32)      # 128 steps
+    y0 = torch.ones(B, d, device=device, dtype=torch.float32)              
+    p = {"mu": torch.tensor(0.1, device=device, dtype=torch.float32),      # Mean
+         "sigma": torch.tensor(0.3, device=device, dtype=torch.float32)}   # St. Dev
 
-    gen = torch.Generator(device=device).manual_seed(7)
-    xT0,_ = sdeint_euler(gbm_f, gbm_g, y0, t, p, gen, return_path=False, use_cuda_kernel=False)
-    gen.manual_seed(7)
-    xT1,_ = sdeint_euler(gbm_f, gbm_g, y0, t, p, gen, return_path=False, use_cuda_kernel=True)
+    gen = torch.Generator(device=device).manual_seed(0)
+    xT0,_ = sdeint_euler(sde_f, sde_g, y0, t, p, gen, return_path=False, use_cuda_kernel=False)
+    gen.manual_seed(0)
+    xT1,_ = sdeint_euler(sde_f, sde_g, y0, t, p, gen, return_path=False, use_cuda_kernel=True)
 
     assert xT0.dtype == xT1.dtype
     max_abs = (xT0 - xT1).abs().max().item()

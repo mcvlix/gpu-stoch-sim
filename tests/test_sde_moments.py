@@ -1,15 +1,15 @@
 import math, torch
 from sdegpu.integrators import sdeint_euler
-from sdegpu.models import gbm_f, gbm_g
+from sdegpu.models import sde_f, sde_g
 
-def test_gbm_moments_cpu():
+def test_sde_moments_cpu():
     device = "cpu"
     B, d = 4096, 1
     t = torch.linspace(0, 1, 256, device=device)
     y0 = torch.ones(B, d, device=device)
     p = {"mu": torch.tensor(0.2, device=device), "sigma": torch.tensor(0.5, device=device)}
     gen = torch.Generator(device=device).manual_seed(42)
-    xT,_ = sdeint_euler(gbm_f, gbm_g, y0, t, p, gen, return_path=False, use_cuda_kernel=False)
+    xT,_ = sdeint_euler(sde_f, sde_g, y0, t, p, gen, return_path=False, use_cuda_kernel=False)
     mean = xT.mean().item()
     var  = xT.var(unbiased=False).item()
     mean_th = math.exp(0.2)

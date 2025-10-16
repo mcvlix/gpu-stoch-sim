@@ -1,6 +1,6 @@
 import time, math, torch
-from simkit.integrators import sdeint_euler
-from simkit.models import gbm_f, gbm_g
+from sdegpu.integrators import sdeint_euler
+from sdegpu.models import sde_f, sde_g
 
 def run(use_cuda_kernel):
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -12,7 +12,7 @@ def run(use_cuda_kernel):
 
     torch.cuda.synchronize() if device == "cuda" else None
     t0 = time.time()
-    xT, _ = sdeint_euler(gbm_f, gbm_g, y0, t, params, generator=gen, use_cuda_kernel=use_cuda_kernel, return_path=False)
+    xT, _ = sdeint_euler(sde_f, sde_g, y0, t, params, generator=gen, use_cuda_kernel=use_cuda_kernel, return_path=False)
     torch.cuda.synchronize() if device == "cuda" else None
     dt = time.time() - t0
     return dt, float(xT.mean().item())
